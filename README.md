@@ -87,8 +87,6 @@ gemini-meet-notes-to-jira/
    - `testDocument()` → con el ID de un Doc de Gemini tuyo; revisa el log.
    - `setup()` → crea las etiquetas de Gmail y el trigger cada 15 minutos.
 
-> 🔒 **Nunca subas tu token a GitHub ni lo pegues en el código.** Va solo en las Propiedades del script, que son privadas de tu proyecto.
-
 ---
 
 ## 🏷️ Etiquetas de Gmail
