@@ -1,0 +1,12 @@
+# Credenciales y configuración local de clasp
+.clasp.json
+.clasprc.json
+.env
+*.env
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+node_modules/
