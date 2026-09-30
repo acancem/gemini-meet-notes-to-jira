@@ -63,8 +63,6 @@ El script necesita que el documento de Gemini tenga **dos pestañas**: las notas
      Al subirla, descomentar la línea siguiente. -->
 <!-- ![Configuración de notas y transcripción de Gemini](img/gemini-configuracion.png) -->
 
-> 💡 Haz una reunión de prueba de un par de minutos y abre el documento que llega por correo. Debe tener una pestaña de notas y otra cuyo título contenga **"Transcripción"**.
-
 ---
 
 ## 4. Configurar Google Calendar
@@ -105,7 +103,7 @@ Para reuniones que **no** pasan por la página de citas (las creas tú a mano, t
 Recomendaciones:
 
 - Pon **solo un** código de ticket en la descripción. Si hay varios, el script toma el primero.
-- Hazlo **antes** de que termine la reunión, o al menos antes de que pasen 7 días. Si llega el correo de Gemini y el evento aún no tiene código, el correo queda con la etiqueta `gemini-notes/sin-ticket` (ver [Operación diaria](#9-operación-diaria)).
+- Hazlo **antes** de que termine la reunión. Si llega el correo de Gemini y el evento aún no tiene código, el correo queda con la etiqueta `gemini-notes/sin-ticket` (ver [Operación diaria](#9-operación-diaria)).
 
 ### ¿Y si no hay código en el evento?
 
@@ -120,14 +118,6 @@ Como respaldo, el script también busca un código de ticket dentro de las notas
 3. Borra el contenido de `Código.gs` y pega todo el contenido de [`src/Code.gs`](../src/Code.gs).
 4. Guarda (`Ctrl + S`).
 
-**Opcional pero recomendado — zona horaria:**
-
-1. Ve a **Configuración del proyecto** (ícono ⚙️).
-2. Activa **Mostrar el archivo de manifiesto "appsscript.json" en el editor**.
-3. Vuelve al editor, abre `appsscript.json` y reemplaza su contenido por el de [`src/appsscript.json`](../src/appsscript.json).
-
-Esto fija la zona horaria en `America/Lima`, que se usa para la fecha que aparece en el encabezado de la transcripción. Si trabajas en otra zona, cámbiala.
-
 ---
 
 ## 6. Configurar las propiedades del script
@@ -136,8 +126,8 @@ Ve a **Configuración del proyecto → Propiedades del script → Añadir propie
 
 | Propiedad | Valor |
 |---|---|
-| `JIRA_BASE` | URL de tu Jira. Ej: `https://tu-org.atlassian.net` |
-| `JIRA_USER_EMAIL` | El correo con el que entras a Atlassian |
+| `JIRA_BASE` | URL de tu Jira. Ej: `https://tu-org.atlassian.net`. En el caso de usuarios de Neotel es https://neotel-us.atlassian.net/ |
+| `JIRA_USER_EMAIL` | El correo con el que entras a Atlassian o Jira |
 | `JIRA_API_TOKEN` | El token del [paso 2](#2-obtener-el-token-de-api-de-atlassian) |
 
 > ℹ️ Con el uso verás aparecer más propiedades con nombres como `done:1AbCdEfGh…` y valores como `SOP2-1234@2026-09-04T16:42:28Z`. Las crea el script: son el registro de qué reuniones y comentarios ya se publicaron, y es lo que evita duplicados (ver [Cómo evita duplicados](#cómo-evita-duplicados)). **No las borres**, salvo que quieras reprocesar una reunión.
@@ -176,8 +166,6 @@ Revisa en el log:
 ---
 
 ## 8. Activar la automatización
-
-> ⚠️ **Antes de activar:** en su primera corrida, el script publicará en Jira **todas** las reuniones de Gemini de los **últimos 7 días**. Si ya subiste alguna a mano, evita duplicarla: en Gmail crea la etiqueta `gemini-notes/procesado` (como subetiqueta de `gemini-notes`) y aplícala a esos correos de Gemini. El script los ignorará.
 
 Ejecuta `setup()`.
 
@@ -225,23 +213,6 @@ Si la transcripción supera ~30.000 caracteres (límite de Jira), se divide en v
 - **Cada comentario** (resumen y cada parte de la transcripción) se registra por separado. Si algo falla a la mitad, el reintento solo sube lo que faltó; el cliente nunca recibe el resumen dos veces.
 - Un bloqueo impide que dos ejecuciones trabajen al mismo tiempo.
 
-### Reprocesar una reunión
-
-Si necesitas volver a publicar una reunión (por ejemplo, borraste los comentarios por error):
-
-1. Añade temporalmente esta función al final del script, con el ID del documento:
-
-   ```javascript
-   function reprocesar() {
-     resetDocument('ID_DEL_DOC_DE_GEMINI');
-   }
-   ```
-
-2. Ejecuta `reprocesar()`.
-3. En Gmail, quita la etiqueta `gemini-notes/procesado` del correo de esa reunión.
-4. Espera al siguiente ciclo (o ejecuta `processGeminiNotes()` a mano).
-5. Borra la función `reprocesar()`.
-
 ---
 
 ## 10. Solución de problemas
@@ -265,5 +236,4 @@ Si necesitas volver a publicar una reunión (por ejemplo, borraste los comentari
 - 🔒 El token **solo** va en las Propiedades del script. Nunca en el código, en capturas de pantalla ni en commits.
 - Cada persona usa **su propio token**. No compartas el tuyo: los comentarios quedarían publicados a tu nombre.
 - Si crees que tu token se filtró, revócalo de inmediato en [id.atlassian.com](https://id.atlassian.com/manage-profile/security/api-tokens) y crea uno nuevo.
-- Al compartir capturas para pedir ayuda, difumina: token, correos de clientes, links de Meet y contenido de las transcripciones.
 - La transcripción se publica **siempre** como nota interna. Si necesitas cambiar ese comportamiento, revisa la función `publishToJira()` con cuidado: una transcripción pública la vería el cliente.
